@@ -1,8 +1,9 @@
 "use client";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Toolbar } from "./Toolbar";
-import { Editor } from "./Editor";
+
 import SettingsModal from "./SettingsModal";
+import TextEditor from "./Editor";
 // import {PaperPlane} from 'lucide-react';
 
 export function Chatbot() {
@@ -10,14 +11,21 @@ export function Chatbot() {
   const [settings, setSettings] = useState(false);
   const [messages, setMessages] = useState([]);
   const editor = useRef(null);
+  const [textValue, setTextValue] = useState("");
 
   const send = () => {
-    const t = editor.current?.getText() || "";
+    const t = textValue;
     if (!t.trim()) return;
     setMessages((m) => [...m, { role: "user", content: t }]);
     setMessages((m) => [...m, { role: "bot", content: "Static reply" }]);
     editor.current?.clear();
   };
+
+  useEffect(() => {
+    if (!textValue.trim()) return;
+    console.log(`Debug - textValue`, textValue);
+    send();
+  }, [textValue]);
 
   return (
     <>
@@ -44,7 +52,7 @@ export function Chatbot() {
             ))}
           </div>
           <div className="chatbot-footer">
-            <Editor ref={editor} />
+            <TextEditor setTextValue={setTextValue} />
             <div
               className="toolbar-row"
               style={{
@@ -53,8 +61,8 @@ export function Chatbot() {
                 marginTop: 8,
               }}
             >
-              <Toolbar />
-              <button className="send-btn" onClick={send}>
+              {/* <Toolbar /> */}
+              <button className="send-btn ml-auto" onClick={send}>
                 rohit
               </button>
             </div>
