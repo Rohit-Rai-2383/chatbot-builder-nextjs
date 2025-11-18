@@ -18,6 +18,18 @@ export function Chatbot() {
     }
   }, [messages, loading]);
 
+  useEffect(() => {
+    setMessages((prev) => {
+      return [
+        ...prev,
+        {
+          role: "bot",
+          content: "Hello! I am your Ticket Bot. How can I assist you today?",
+        },
+      ];
+    });
+  }, []);
+
   const send = async (text: string) => {
     if (!text.trim()) return;
 
@@ -49,7 +61,7 @@ export function Chatbot() {
 
       {open && (
         <div
-          className="fixed bottom-28 right-6 w-[380px] max-h-[450px] 
+          className="fixed bottom-28 right-6 w-[380px] h-[450px] 
           bg-white rounded-2xl shadow-xl border border-gray-200 
           flex flex-col z-50 overflow-hidden"
         >
