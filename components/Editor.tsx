@@ -63,7 +63,6 @@ const TextEditor = forwardRef(function TextEditor(
       const json = editor.getJSON();
       let text = "";
       let extractedMentions: any[] = [];
-
       function walk(node: any) {
         if (node.type === "mention") {
           text += `@${node.attrs.value}`;
