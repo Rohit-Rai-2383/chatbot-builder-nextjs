@@ -21,3 +21,7 @@
 .ProseMirror-focused {
   outline: none;
 }
+
+*::-webkit-scrollbar {
+  display: none;
+}
