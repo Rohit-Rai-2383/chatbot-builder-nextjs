@@ -1,13 +1,13 @@
 "use client";
 
+import { forwardRef, useEffect, useRef } from "react";
 import { useEditor, EditorContent, Extension } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { EnterHandler } from "../configs/EditorConfigs";
 import styles from "../styles/Editor.module.css";
-import { useEffect, useRef, useState } from "react";
-
 import Image from "next/image";
 import { X } from "lucide-react";
+
 const ShiftEnterHandler = Extension.create({
   name: "shiftEnterHandler",
   addKeyboardShortcuts() {
@@ -21,28 +21,32 @@ const ShiftEnterHandler = Extension.create({
     };
   },
 });
-export default function TextEditor({
-  setTextValue,
-}: {
-  setTextValue: (value: string) => void;
-}) {
+
+const TextEditor = forwardRef(function TextEditor(
+  {
+    sendMessage,
+    setTextValue,
+  }: {
+    sendMessage: Function;
+    setTextValue: Function;
+  },
+  ref: any
+) {
   const atValuesRef = useRef<any[]>([]);
   const inputTextRef = useRef<string>("");
   const inputRef = useRef<string>("");
   const handlerRef = useRef<any>(() => {});
   const editorRef = useRef<any>(null);
 
-  // useEffect(() => {
-  //   handlerRef.current = enterKeyHandler;
-  // }, [enterKeyHandler]);
-
   const editor = useEditor({
     extensions: [
       StarterKit,
       ShiftEnterHandler,
       EnterHandler(() => {
-        setTextValue(editorRef.current?.getText() || "");
-        editor?.commands.clearContent();
+        console.log(`Debug - bforesendcall`);
+        sendMessage(editorRef.current?.getText() || "");
+        // editor?.commands.clearContent();
+        console.log(`Debug -aftersendcall`);
 
         editorRef.current?.commands.setContent("");
 
@@ -53,6 +57,8 @@ export default function TextEditor({
     immediatelyRender: false,
     onUpdate: ({ editor }) => {
       const html = editor.getHTML();
+      console.log(`Debug - `);
+      setTextValue(editor.getText() || "");
 
       const json = editor.getJSON();
       let text = "";
@@ -75,9 +81,13 @@ export default function TextEditor({
     },
   });
 
+  // attach editor instance to both internal ref and forwarded ref
   useEffect(() => {
     editorRef.current = editor;
-  }, [editor]);
+    if (ref) {
+      ref.current = editor;
+    }
+  }, [editor, ref]);
 
   return (
     <div
@@ -93,4 +103,6 @@ export default function TextEditor({
       </div>
     </div>
   );
-}
+});
+
+export default TextEditor;
