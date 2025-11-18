@@ -16,3 +16,8 @@
 .editor{min-height:60px;padding:8px;border:1px solid #ddd;border-radius:6px;background:white;}
 .dialog-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4)}
 .dialog-content{background:white;padding:20px;border-radius:8px;position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);width:300px;}
+
+
+.ProseMirror-focused {
+  outline: none;
+}
