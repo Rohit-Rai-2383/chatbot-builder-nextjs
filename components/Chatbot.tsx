@@ -49,7 +49,7 @@ export function Chatbot() {
 
       {open && (
         <div
-          className="fixed bottom-28 right-6 w-[380px] max-h-[600px] 
+          className="fixed bottom-28 right-6 w-[380px] max-h-[450px] 
           bg-white rounded-2xl shadow-xl border border-gray-200 
           flex flex-col z-50 overflow-hidden"
         >
