@@ -1,0 +1,63 @@
+/* Import react-quill styles */
+/* @import "react-quill-new/dist/quill.snow.css"; */
+
+.editor {
+  width: 100%;
+}
+
+.editor :global(.ql-snow) {
+  border: none !important;
+}
+
+.editor :global(.ql-container) {
+  border: none !important;
+}
+
+.editor :global(.mention) {
+  color: #3b82f6;
+  font-weight: 500;
+  padding: 2px 4px;
+  width: 100%;
+}
+
+.editor :global(.ql-container.ql-snow) {
+  border: none;
+  font-family: inherit;
+  font-size: 14px;
+}
+
+.editor :global(.ql-editor) {
+  padding: 0 16px !important;
+  max-height: 100px;
+  overflow-y: auto;
+  border: none !important;
+  outline: none !important;
+}
+
+.editor :global(.ql-blank) {
+  padding: 0 16px;
+}
+
+.editor :global(.ql-editor.ql-blank::before) {
+  padding: 0 16px;
+  left: 0;
+  font-style: normal;
+  color: #9e9e9e;
+}
+
+.editor :global(#quill-mention-item-0) {
+  position: sticky;
+  top: 0;
+}
+
+/* Remove any default focus styles */
+.editor :global(.ql-editor:focus) {
+  outline: none !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* Remove toolbar-related styles since we're not using it */
+.editor :global(.ql-toolbar) {
+  display: none !important;
+}
