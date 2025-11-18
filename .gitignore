@@ -1,0 +1,36 @@
+
+# Node modules
+node_modules/
+
+# Build outputs (DO NOT PUSH THESE)
+dist/
+.next/
+out/
+
+# Lockfiles (optional but recommended to ignore if using multiple environments)
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Environment files (never commit secrets)
+.env
+.env.local
+.env.*.local
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+*.log
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Editor configs
+.vscode/
+.idea/
+
+# Temporary folders
+tmp/
+cache/
