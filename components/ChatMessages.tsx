@@ -1,5 +1,8 @@
 "use client";
 
+import MarkdownMessage from "./MarkdownMessage";
+import BotProcessing from "./BotProcessing";
+
 export default function ChatMessages({ messages }) {
   return (
     <>
@@ -11,13 +14,12 @@ export default function ChatMessages({ messages }) {
         return (
           <div key={i} className="space-y-1">
             <p
-              className={`text-[11px] ${
-                isUser ? "text-right text-gray-500" : "text-left text-gray-500"
+              className={`text-[11px] text-gray-500 ${
+                isUser ? "text-right" : "text-left"
               }`}
             >
-              {isUser ? "You" : "Ticket Bot"}
+              {isUser ? "You" : "Bot"}
             </p>
-
             <div
               className={`flex items-start gap-2 ${
                 isUser ? "justify-end" : "justify-start"
@@ -28,21 +30,22 @@ export default function ChatMessages({ messages }) {
                   🤖
                 </div>
               )}
-
-              <div
-                className={`px-4 py-2 rounded-2xl max-w-[75%] text-[14px] whitespace-pre-line leading-relaxed
-                  ${
-                    isUser
-                      ? "bg-blue-600 text-white"
-                      : isProcessing
-                      ? "bg-yellow-100 text-yellow-900 border border-yellow-300"
-                      : isError
-                      ? "bg-red-100 text-red-800 border border-red-300"
-                      : "bg-white text-gray-900 border border-gray-200 shadow-sm"
-                  }
-                `}
-              >
-                {m.content}
+              <div className="max-w-[90%]">
+                {isProcessing ? (
+                  <BotProcessing text={m.content} />
+                ) : isError ? (
+                  <div className="px-4 py-2 rounded-2xl bg-red-100 text-red-800 border border-red-300 text-[14px]">
+                    {m.content}
+                  </div>
+                ) : isUser ? (
+                  <div className="px-4 py-2 rounded-2xl bg-blue-600 text-white text-[14px] leading-relaxed">
+                    {m.content}
+                  </div>
+                ) : (
+                  <div className="px-4 py-2 rounded-2xl bg-white text-gray-900 border border-gray-200 shadow-sm text-[14px] leading-relaxed">
+                    <MarkdownMessage text={m.content} />
+                  </div>
+                )}
               </div>
             </div>
           </div>
