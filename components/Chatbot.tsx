@@ -2,10 +2,17 @@
 import React, { useEffect, useRef, useState } from "react";
 import ChatInput from "./ChatInput";
 import ChatMessages from "./ChatMessages";
+import { responseType, role } from "../utils/constants";
+import { TMessage } from "../utils/types";
 
 export function Chatbot() {
   const [open, setOpen] = useState(false);
-  const [messages, setMessages] = useState<any[]>([]);
+  const [messages, setMessages] = useState<TMessage[]>([
+    {
+      role: role.BOT_ROLE,
+      content: "Hello! I am your helping hand. How can I assist you today?",
+    },
+  ]);
   const [loading, setLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const wsRef = useRef<WebSocket | null>(null);
@@ -21,33 +28,23 @@ export function Chatbot() {
     }
   }, [messages, loading]);
 
-  useEffect(() => {
-    setMessages([
-      {
-        role: "bot",
-        content: "Hello! I am your helping hand. How can I assist you today?",
-      },
-    ]);
-  }, []);
-
   const openSocket = () => {
     if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) return;
 
-    const ws = new WebSocket("ws://192.168.29.99:4000/ws/agent");
+    const ws = new WebSocket(process.env.NEXT_PUBLIC_WEB_SOCKET_URL);
     wsRef.current = ws;
 
     ws.onopen = () => {
       console.log("WS Connected");
 
       if (!hasSentAuth.current) {
-        ws.send(JSON.stringify({ type: "auth", token: TOKEN }));
+        ws.send(JSON.stringify({ type: responseType.AUTH, token: TOKEN }));
         hasSentAuth.current = true;
         console.log("AUTH sent");
       }
     };
 
     ws.onmessage = (event) => {
-      // console.log("WS RAW:", event.data);
       setLoading(false);
 
       let parsed: any = null;
@@ -56,52 +53,52 @@ export function Chatbot() {
       } catch {
         setMessages((m) => [
           ...m,
-          { role: "bot-error", content: "Invalid server response." },
+          { role: role.ERROR_ROLE, content: "Invalid server response." },
         ]);
         return;
       }
 
-      if (parsed.type === "processing") {
+      if (parsed.type === responseType.PROCESSING) {
         if (processingTimeoutRef.current)
           clearTimeout(processingTimeoutRef.current);
 
         setMessages((prev) =>
-          prev.filter((msg) => msg.role !== "bot-processing")
+          prev.filter((msg) => msg.role !== role.PROCESSING_ROLE)
         );
 
         setMessages((prev) => [
           ...prev,
-          { role: "bot-processing", content: parsed.message },
+          { role: role.PROCESSING_ROLE, content: parsed.message },
         ]);
 
         startProcessingTimeout();
         return;
       }
 
-      if (parsed.type === "response") {
+      if (parsed.type === responseType.RESPONSE) {
         if (processingTimeoutRef.current) {
           clearTimeout(processingTimeoutRef.current);
         }
 
         setMessages((prev) =>
-          prev.filter((msg) => msg.role !== "bot-processing")
+          prev.filter((msg) => msg.role !== role.PROCESSING_ROLE)
         );
 
         streamBotResponse(parsed.answer);
         return;
       }
 
-      if (parsed.type === "error") {
+      if (parsed.type === responseType.ERROR) {
         setMessages((m) => [
           ...m,
-          { role: "bot-error", content: parsed.message },
+          { role: role.ERROR_ROLE, content: parsed.message },
         ]);
         return;
       }
 
       setMessages((m) => [
         ...m,
-        { role: "bot-error", content: "Unknown response format." },
+        { role: role.ERROR_ROLE, content: "Unknown response format." },
       ]);
     };
 
@@ -109,7 +106,7 @@ export function Chatbot() {
       setMessages((m) => [
         ...m,
         {
-          role: "bot-error",
+          role: role.ERROR_ROLE,
           content: "WebSocket error occurred.",
         },
       ]);
@@ -125,16 +122,21 @@ export function Chatbot() {
       return;
     }
 
-    setMessages((m) => [...m, { role: "user", content: text }]);
+    setMessages((m) => [...m, { role: role.USER_ROLE, content: text }]);
     setLoading(true);
 
-    wsRef.current.send(JSON.stringify({ type: "query", query: text }));
+    wsRef.current.send(
+      JSON.stringify({ type: responseType.QUERY, query: text })
+    );
   };
 
   const streamBotResponse = (fullText: string) => {
     let index = 0;
 
-    setMessages((prev) => [...prev, { role: "bot-stream", content: "" }]);
+    setMessages((prev) => [
+      ...prev,
+      { role: role.BOT_STREAM_ROLE, content: "" },
+    ]);
 
     const interval = setInterval(() => {
       index++;
@@ -143,7 +145,7 @@ export function Chatbot() {
         const updated = [...prev];
         const lastMsg = updated[updated.length - 1];
 
-        if (lastMsg.role === "bot-stream") {
+        if (lastMsg.role === role.BOT_STREAM_ROLE) {
           lastMsg.content = fullText.slice(0, index);
         }
 
@@ -157,7 +159,7 @@ export function Chatbot() {
         setMessages((prev) => {
           const updated = [...prev];
           updated[updated.length - 1] = {
-            role: "bot",
+            role: role.BOT_ROLE,
             content: fullText,
           };
           return updated;
@@ -173,11 +175,13 @@ export function Chatbot() {
 
     processingTimeoutRef.current = setTimeout(() => {
       setMessages((prev) => {
-        const filtered = prev.filter((msg) => msg.role !== "bot-processing");
+        const filtered = prev.filter(
+          (msg) => msg.role !== role.PROCESSING_ROLE
+        );
         return [
           ...filtered,
           {
-            role: "bot-processing",
+            role: role.PROCESSING_ROLE,
             content: "Still working… this is taking longer than usual.",
           },
         ];
