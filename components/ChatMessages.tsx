@@ -2,14 +2,15 @@
 
 import MarkdownMessage from "./MarkdownMessage";
 import BotProcessing from "./BotProcessing";
+import { role } from "../utils/constants";
 
 export default function ChatMessages({ messages }) {
   return (
     <>
       {messages.map((m, i) => {
-        const isUser = m.role === "user";
-        const isProcessing = m.role === "bot-processing";
-        const isError = m.role === "bot-error";
+        const isUser = m.role === role.USER_ROLE;
+        const isProcessing = m.role === role.PROCESSING_ROLE;
+        const isError = m.role === role.ERROR_ROLE;
 
         return (
           <div key={i} className="space-y-1">
@@ -31,7 +32,7 @@ export default function ChatMessages({ messages }) {
                 </div>
               )}
               <div className="max-w-[90%]">
-                {isProcessing ? (
+                {isProcessing && !isError ? (
                   <BotProcessing text={m.content} />
                 ) : isError ? (
                   <div className="px-4 py-2 rounded-2xl bg-red-100 text-red-800 border border-red-300 text-[14px]">
