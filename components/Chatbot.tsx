@@ -5,7 +5,16 @@ import ChatMessages from "./ChatMessages";
 import { responseType, role } from "../utils/constants";
 import { TMessage } from "../utils/types";
 
-export function Chatbot() {
+export function Chatbot({
+  token,
+  socketUrl,
+}: {
+  token: string;
+  socketUrl: string;
+}) {
+  const TOKEN = token || "";
+  const SOCKET_URL = socketUrl || "";
+
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<TMessage[]>([
     {
@@ -19,9 +28,6 @@ export function Chatbot() {
   const hasSentAuth = useRef(false);
   const processingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const TOKEN =
-    "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2FwaS1wcm9kLmZ1cm5pc2hrYXJvLmNvbS9sb2dpbiIsImlhdCI6MTc2MzQ3MDQxMiwiZXhwIjoxNzk1MDA2NDEyLCJuYmYiOjE3NjM0NzA0MTIsImp0aSI6IlNTdEhkUWtrZkE2ZTRSVHUiLCJzdWIiOiI5YzFlMjVjYi05MGFiLTQ2OTYtYThmNC03OWQyMzk3OTRlYjciLCJwcnYiOiIyM2JkNWM4OTQ5ZjYwMGFkYjM5ZTcwMWM0MDA4NzJkYjdhNTk3NmY3In0.ErSqEK8w7D3BW5P7SxO7ebqEjQEA_9JVa0p5tSTOWso";
-
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
@@ -31,7 +37,7 @@ export function Chatbot() {
   const openSocket = () => {
     if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) return;
 
-    const ws = new WebSocket(process.env.NEXT_PUBLIC_WEB_SOCKET_URL);
+    const ws = new WebSocket(SOCKET_URL);
     wsRef.current = ws;
 
     ws.onopen = () => {
